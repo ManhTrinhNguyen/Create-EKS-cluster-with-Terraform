@@ -1,157 +1,42 @@
-# variable "vpc-cidr" {}
-# variable "eks-public-subnet-1" {}
-# variable "eks-public-subnet-2" {}
-# variable "eks-private-subnet-1" {}
-# variable "eks-private-subnet-2" {}
-
-
-resource "aws_vpc" "eks-vpc" {
-    cidr_block = "10.0.0.0/16"
-    tags = {
-        Name = "eks-vpc"
-    } 
+variable "vpc-cidr" {}
+variable "private-subnets" {
+  type = list(string)  
+}
+variable "public-subnets" {
+  type = list(string)
 }
 
-resource "aws_subnet" "eks-public-subnet-1" {
-    vpc_id = aws_vpc.eks-vpc.id
-    cidr_block = "10.0.0.0/18"
-    availability_zone = "us-west-1a"
+### Automatically get AZs in the region
 
-    tags = {
-        Name = "eks-public-subnet-1"
-    }
+data "aws_availability_zones" "available" {
+  state = "available"
 }
 
-resource "aws_subnet" "eks-public-subnet-2" {
-    vpc_id = aws_vpc.eks-vpc.id
-    cidr_block = "10.0.64.0/18"
-    availability_zone = "us-west-1b"
-    tags = {
-        Name = "eks-public-subnet-2"
-    }
-}
+### Create VPC and Subnets
+module "vpc" {
+  source = "terraform-aws-modules/vpc/aws"
 
-resource "aws_subnet" "eks-private-subnet-1" {
-    vpc_id = aws_vpc.eks-vpc.id
-    cidr_block = "10.0.128.0/18"
-    availability_zone = "us-west-1a"
-    tags = {
-        Name = "eks-private-subnet-1"
-    }
-}
+  name = "eks-vpc"
+  cidr = var.vpc-cidr
 
-resource "aws_subnet" "eks-private-subnet-2" {
-    vpc_id = aws_vpc.eks-vpc.id
-    cidr_block = "10.0.192.0/18"
-    availability_zone = "us-west-1b"
-    tags = {
-        Name = "eks-private-subnet-2"
-    }
-}
+  azs             = data.aws_availability_zones.available.names
+  private_subnets = var.private-subnets
+  public_subnets  = var.public-subnets
 
-### Create Internet Gateway 
+  enable_nat_gateway = true
+  single_nat_gateway = true
+  enable_dns_hostnames = true
 
-resource "aws_internet_gateway" "eks-igw" {
-    vpc_id = aws_vpc.eks-vpc.id
-    tags = {
-        Name = "eks-igw"
-    }
-}
-
-
-### Create Elastic IP for NAT Gateway
-
-resource "aws_eip" "nat-eip-1" {
-  domain = "vpc"
-}
-
-resource "aws_eip" "nat-eip-2" {
-  domain = "vpc"
-}
-
-### Create NAT Gateway
-
-resource "aws_nat_gateway" "eks-nat-gateway-1" {
-  allocation_id = aws_eip.nat-eip-1.id
-  subnet_id     = aws_subnet.eks-public-subnet-1.id 
-  tags = {
-    Name = "gw NAT public subnet 1"
-  }
-}
-
-resource "aws_nat_gateway" "eks-nat-gateway-2" {
-  allocation_id = aws_eip.nat-eip-2.id
-  subnet_id     = aws_subnet.eks-public-subnet-2.id
 
   tags = {
-    Name = "gw NAT public subnet 2"
-  }
-}
-
-### Create Route Table for Public Subnets
-
-resource "aws_route_table" "eks-rtb-public" {
-  vpc_id = aws_vpc.eks-vpc.id
-
-  route {
-    cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.eks-igw.id
+    "kubernetes.io/cluster/eks-cluster" = "shared"
   }
 
-  tags = {
-    Name = "rtb public"
-  }
-}
-
-### Associate Route Table with Public Subnets
-
-resource "aws_route_table_association" "eks-rtb-public-association-1" {
-  subnet_id = aws_subnet.eks-public-subnet-1.id
-  route_table_id = aws_route_table.eks-rtb-public.id
-}   
-
-resource "aws_route_table_association" "eks-rtb-public-association-2" {
-  subnet_id = aws_subnet.eks-public-subnet-2.id
-  route_table_id = aws_route_table.eks-rtb-public.id
-}
-
-### Create Route Table for Private Subnets
-
-resource "aws_route_table" "eks-rtb-private-1" {
-  vpc_id = aws_vpc.eks-vpc.id
-
-  route {
-    cidr_block = "0.0.0.0/0"
-    nat_gateway_id = aws_nat_gateway.eks-nat-gateway-1.id
+  public_subnet_tags = {
+    "kubernetes.io/role/elb" = "1"
   }
 
-  tags = {
-    Name = "rtb private 1"
+  private_subnet_tags = {
+    "kubernetes.io/role/internal-elb" = "1"
   }
 }
-
-resource "aws_route_table" "eks-rtb-private-2" {
-  vpc_id = aws_vpc.eks-vpc.id
-
-  route {
-    cidr_block = "0.0.0.0/0"
-    nat_gateway_id = aws_nat_gateway.eks-nat-gateway-2.id
-  }
-
-  tags = {
-    Name = "rtb private 2"
-  }
-}
-
-### Associate Route Table with Private Subnets
-
-resource "aws_route_table_association" "eks-rtb-private-association-1" {
-  subnet_id = aws_subnet.eks-private-subnet-1.id
-  route_table_id = aws_route_table.eks-rtb-private-1.id
-}
-
-resource "aws_route_table_association" "eks-rtb-private-association-2" {
-  subnet_id = aws_subnet.eks-private-subnet-2.id
-  route_table_id = aws_route_table.eks-rtb-private-2.id
-}
-
