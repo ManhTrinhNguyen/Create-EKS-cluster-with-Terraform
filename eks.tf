@@ -40,3 +40,18 @@ module "eks" {
     Terraform   = "true"
   }
 }
+
+### Fetch Auto Scaler Role ARN
+
+data "aws_iam_role" "cluster-autoscaler-role" {
+    name = "Pod-Identity-Cluster-Auto-Scaler"
+}
+
+### Create Pod Identity Association
+
+resource "aws_eks_pod_identity_association" "cluster-autoscaler-pod-identity-association" {
+    cluster_name = module.eks.cluster_name
+    namespace = "kube-system"
+    service_account = "cluster-autoscaler"
+    role_arn = data.aws_iam_role.cluster-autoscaler-role.arn
+}
