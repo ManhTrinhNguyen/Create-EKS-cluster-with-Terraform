@@ -1,7 +1,7 @@
 ### Fetch created IAM roles for EKS cluster and node group
 
 data "aws_iam_role" "eks-role" {
-    name = "EKS-Role"
+    name = "EKS-role"
 }
 
 data "aws_iam_role" "eks-managed-node-group-role" {
