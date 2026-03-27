@@ -1,0 +1,43 @@
+apiVersion: monitoring.coreos.com/v1alpha1
+kind: AlertmanagerConfig
+metadata:
+  namespace: default
+  name: main-rules-alert
+  labels:
+    app: kube-prometheus-stack
+    release: prometheus-monitoring
+spec:
+  receivers:
+  - name: 'email'
+    emailConfigs:
+    - to : 'nguyenmanhtrinh17041998@gmail.com'
+      from: 'nguyenmanhtrinh17041998@gmail.com'
+      smarthost: smtp.gmail.com:587
+      authUsername: 'nguyenmanhtrinh17041998@gmail.com'
+      authIdentity: 'nguyenmanhtrinh17041998@gmail.com'
+      authPassword:
+        name: gmail-auth
+        key: password
+  - name: 'slack'
+    slackConfigs:
+    - apiURL: 
+        key: "apiURL"
+        name: "slack-api-url"
+      channel: '#prometheus'
+  route:
+    receiver: 'email'
+    repeatInterval: 5m
+    groupBy: ['namespace']
+    routes:
+    - matchers:
+      - name: alertname
+        value: HostHighCPULoad
+    receiver: 'slack'
+    repeatInterval: 1m
+    # Slack receiver for KubernetesPodCrashLooping alert
+    routes:
+    - matchers:
+      - name: alertname
+        value: KubernetesPodCrashLooping
+      receiver: 'slack'
+      repeatInterval: 1m
