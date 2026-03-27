@@ -1,7 +1,7 @@
 resource "aws_vpc" "eks-vpc" {
     cidr_block = variable.eks-vpc-cidr
     tags = {
-        Name = variable.eks-vpc-name
+        Name = var.eks-vpc-name
     } 
 }
 
@@ -17,7 +17,7 @@ resource "aws_subnet" "eks-public-subnet-1" {
 
 resource "aws_subnet" "eks-public-subnet-2" {
     vpc_id = aws_vpc.eks-vpc.id
-    cidr_block = variable.eks-public-subnets-2
+    cidr_block = var.eks-public-subnets-2
     availability_zone = "us-west-1b"
     tags = {
         Name = "eks-public-subnet-2"
@@ -26,7 +26,7 @@ resource "aws_subnet" "eks-public-subnet-2" {
 
 resource "aws_subnet" "eks-private-subnet-1" {
     vpc_id = aws_vpc.eks-vpc.id
-    cidr_block = variable.eks-private-subnets-1
+    cidr_block = var.eks-private-subnets-1
     availability_zone = "us-west-1a"
     tags = {
         Name = "eks-private-subnet-1"
@@ -35,7 +35,7 @@ resource "aws_subnet" "eks-private-subnet-1" {
 
 resource "aws_subnet" "eks-private-subnet-2" {
     vpc_id = aws_vpc.eks-vpc.id
-    cidr_block = varialbe.eks-private-subnets-2
+    cidr_block = var.eks-private-subnets-2
     availability_zone = "us-west-1b"
     tags = {
         Name = "eks-private-subnet-2"
