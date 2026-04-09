@@ -55,3 +55,4 @@ resource "aws_eks_pod_identity_association" "cluster-autoscaler-pod-identity-ass
     service_account = "cluster-autoscaler"
     role_arn = data.aws_iam_role.cluster-autoscaler-role.arn
 }
+
