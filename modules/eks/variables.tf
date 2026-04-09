@@ -1,14 +1,8 @@
-variable "eks-role" {
-  default = "EKS-Role"
-}
+variable "eks-role" {}
 
-variable "eks-managed-node-group-role" {
-  default = "EKS-Managed-Node-Group"
-}
+variable "eks-managed-node-group-role" {}
 
-variable "cluster-autoscaler-role" {
-  default = "Pod-Identity-Cluster-Auto-Scaler"
-}
+variable "cluster-autoscaler-role" {}
 
 variable "eks-cluster-name" {
   default = "eks-cluster"
@@ -27,8 +21,15 @@ variable "principal-arn" {
 }
 
 variable "region" {
-  default = "us-west-1"
+  default = "us-west-1" 
 }
-variable "policy-arn" {
-  default = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+
+variable "policy-arn" {}
+
+variable "private-subnet-1-id" {
+  
+}
+
+variable "private-subnet-2-id" {
+  
 }

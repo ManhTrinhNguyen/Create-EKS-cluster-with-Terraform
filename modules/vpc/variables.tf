@@ -1,7 +1,6 @@
-variable "eks-vpc-cidr" {
-  type = string
-  default = "10.0.0.0/16"
-}
+variable "eks-vpc-id" {}
+
+
 
 variable "eks-vpc-name" {
   default = "eks-vpc"

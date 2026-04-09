@@ -24,8 +24,8 @@ resource "aws_eks_cluster" "eks-cluster" {
         endpoint_public_access  = true
 
         subnet_ids = [
-            aws_subnet.eks-private-subnet-1.id,
-            aws_subnet.eks-private-subnet-2.id
+            var.private-subnet-1-id,
+            var.private-subnet-2-id
         ]
     }
 
@@ -43,13 +43,13 @@ resource "aws_eks_cluster" "eks-cluster" {
 ### Create EKS Managed Node Group
 resource "aws_eks_node_group" "eks-managed-node-group" {
     cluster_name = aws_eks_cluster.eks-cluster.name
-    node_group_name = var.eks.managed-node-group-name
+    node_group_name = var.eks-managed-node-group-name
 
     node_role_arn = data.aws_iam_role.eks-managed-node-group-role.arn
     
     subnet_ids = [
-        aws_subnet.eks-private-subnet-1.id,
-        aws_subnet.eks-private-subnet-2.id
+        var.private-subnet-1-id,
+        var.private-subnet-2-id
     ]
 
     scaling_config {

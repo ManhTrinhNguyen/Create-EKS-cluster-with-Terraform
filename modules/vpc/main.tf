@@ -1,12 +1,5 @@
-resource "aws_vpc" "eks-vpc" {
-    cidr_block = variable.eks-vpc-cidr
-    tags = {
-        Name = var.eks-vpc-name
-    } 
-}
-
 resource "aws_subnet" "eks-public-subnet-1" {
-    vpc_id = aws_vpc.eks-vpc.id
+    vpc_id = var.eks-vpc-id
     cidr_block = var.eks-public-subnets-1
     availability_zone = "us-west-1a"
 
@@ -16,7 +9,7 @@ resource "aws_subnet" "eks-public-subnet-1" {
 }
 
 resource "aws_subnet" "eks-public-subnet-2" {
-    vpc_id = aws_vpc.eks-vpc.id
+    vpc_id = var.eks-vpc-id
     cidr_block = var.eks-public-subnets-2
     availability_zone = "us-west-1b"
     tags = {
@@ -25,7 +18,7 @@ resource "aws_subnet" "eks-public-subnet-2" {
 }
 
 resource "aws_subnet" "eks-private-subnet-1" {
-    vpc_id = aws_vpc.eks-vpc.id
+    vpc_id = var.eks-vpc-id
     cidr_block = var.eks-private-subnets-1
     availability_zone = "us-west-1a"
     tags = {
@@ -34,7 +27,7 @@ resource "aws_subnet" "eks-private-subnet-1" {
 }
 
 resource "aws_subnet" "eks-private-subnet-2" {
-    vpc_id = aws_vpc.eks-vpc.id
+    vpc_id = var.eks-vpc-id
     cidr_block = var.eks-private-subnets-2
     availability_zone = "us-west-1b"
     tags = {
@@ -45,7 +38,7 @@ resource "aws_subnet" "eks-private-subnet-2" {
 ### Create Internet Gateway 
 
 resource "aws_internet_gateway" "eks-igw" {
-    vpc_id = aws_vpc.eks-vpc.id
+    vpc_id = var.eks-vpc-id
     tags = {
         Name = "eks-igw"
     }
@@ -66,7 +59,7 @@ resource "aws_eip" "nat-eip-2" {
 
 resource "aws_nat_gateway" "eks-nat-gateway-1" {
   allocation_id = aws_eip.nat-eip-1.id
-  subnet_id     = aws_subnet.eks-public-subnet-1.id 
+  subnet_id     = aws_subnet.eks-public-subnet-1.id
   tags = {
     Name = "gw NAT public subnet 1"
   }
@@ -84,7 +77,7 @@ resource "aws_nat_gateway" "eks-nat-gateway-2" {
 ### Create Route Table for Public Subnets
 
 resource "aws_route_table" "eks-rtb-public" {
-  vpc_id = aws_vpc.eks-vpc.id
+  vpc_id = var.eks-vpc-id
 
   route {
     cidr_block = "0.0.0.0/0"
@@ -111,7 +104,7 @@ resource "aws_route_table_association" "eks-rtb-public-association-2" {
 ### Create Route Table for Private Subnets
 
 resource "aws_route_table" "eks-rtb-private-1" {
-  vpc_id = aws_vpc.eks-vpc.id
+  vpc_id = var.eks-vpc-id
 
   route {
     cidr_block = "0.0.0.0/0"
@@ -124,7 +117,7 @@ resource "aws_route_table" "eks-rtb-private-1" {
 }
 
 resource "aws_route_table" "eks-rtb-private-2" {
-  vpc_id = aws_vpc.eks-vpc.id
+  vpc_id = var.eks-vpc-id
 
   route {
     cidr_block = "0.0.0.0/0"
