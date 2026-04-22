@@ -13,6 +13,7 @@ data "aws_availability_zones" "available" {
 }
 
 ### Create VPC and Subnets
+
 module "vpc" {
   source = "terraform-aws-modules/vpc/aws"
 
