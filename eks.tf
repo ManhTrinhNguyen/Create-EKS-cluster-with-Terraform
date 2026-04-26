@@ -16,7 +16,7 @@ module "eks" {
     eks-pod-identity-agent = {
       before_compute = true
     }
-    kube-proxy             = {}
+    kube-proxy            = {}
     vpc-cni                = {
       before_compute = true
     }
