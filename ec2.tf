@@ -23,6 +23,14 @@ resource "aws_vpc_security_group_ingress_rule" "my-ec2-SG-ingress-rule-80" {
   to_port = 80
 }
 
+resource "aws_vpc_security_group_ingress_rule" "my-ec2-SG-ingress-rule-8080" {
+  security_group_id = aws_security_group.my-ec2-SG.id
+  cidr_ipv4 = "0.0.0.0/0"
+  from_port = 8080
+  ip_protocol = "tcp"
+  to_port = 8080
+}
+
 resource "aws_vpc_security_group_ingress_rule" "my-ec2-SG-ingress-rule-443" {
   security_group_id = aws_security_group.my-ec2-SG.id
   cidr_ipv4 = "0.0.0.0/0"
@@ -37,15 +45,16 @@ resource "aws_vpc_security_group_egress_rule" "my-ec2-SG-egress-all" {
   ip_protocol       = "-1"
 }
 
-resource "aws_instance" "my-ec2" {
+resource "aws_instance" "my-ec2-0" {
     associate_public_ip_address = true
-    instance_type = "t2.micro"
+    instance_type = "t3.medium"
     ami = "ami-02671e999eec7752f"
     key_name = "redhat"
-    subnet_id = module.my-vpc.pl-subnet-1-ojb.id
+    subnet_id = module.my-vpc.pl-subnet-1-obj.id
     vpc_security_group_ids = [aws_security_group.my-ec2-SG.id]
     
     tags = {
       Name = "my-instance"
     }
 }
+

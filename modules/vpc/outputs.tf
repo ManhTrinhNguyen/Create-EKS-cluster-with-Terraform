@@ -2,7 +2,7 @@ output "vpc-obj" {
   value = aws_vpc.my-vpc
 }
 
-output "pl-subnet-1-ojb" {
+output "pl-subnet-1-obj" {
   value = aws_subnet.my-public-subnet-1
 }
 
