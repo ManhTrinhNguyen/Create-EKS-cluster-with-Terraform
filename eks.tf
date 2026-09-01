@@ -21,6 +21,7 @@ module "eks" {
       before_compute = true
     }
     aws-ebs-csi-driver = {}
+    aws-secrets-store-csi-driver-provider = {}
   }
 
   vpc_id     = module.vpc.vpc_id
@@ -46,7 +47,7 @@ module "eks" {
 ### Fetch Auto Scaler Role ARN
 
 data "aws_iam_role" "cluster-autoscaler-role" {
-    name = "Pod-Identity-Cluster-Auto-Scaler"
+  name = "Auto-Scaler-Role"
 }
 
 ### Create Pod Identity Association
@@ -56,7 +57,7 @@ resource "aws_eks_pod_identity_association" "cluster-autoscaler-pod-identity-ass
     namespace = "kube-system"
     service_account = "cluster-autoscaler"
     role_arn = data.aws_iam_role.cluster-autoscaler-role.arn
-}
+} 
 
 ### Fetch EBS Driver Role ARN
 
@@ -72,3 +73,17 @@ resource "aws_eks_pod_identity_association" "ebs-driver-pod-identity-association
     role_arn = data.aws_iam_role.ebs-driver-role.arn
 }
 
+### Fetch Secret Manager Role 
+
+# data "aws_iam_role" "secret-manager-role" {
+#   name = "AWS_Secret_Manager"
+# }
+
+# ### Create Pod Identity Association 
+
+# resource "aws_eks_pod_identity_association" "secret-manager-pod-identity-association" {
+#   cluster_name = module.eks.cluster_name 
+#   namespace = "default"
+#   service_account = "test-deployment-sa"
+#   role_arn = data.aws_iam_role.secret-manager-role.arn
+# }

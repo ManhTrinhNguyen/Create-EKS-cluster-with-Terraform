@@ -6,6 +6,7 @@ variable "public-subnets" {
   type = list(string)
 }
 
+
 ### Automatically get AZs in the region
 
 data "aws_availability_zones" "available" {
